@@ -86,6 +86,15 @@ int doServer(int portNum){
 }
 
 void doWork(int conn_sock, struct sockaddr_in *client_addr){
+    string request;
+
+    char readBuffer[81];
+
+    int charsRead = read(conn_sock, readBuffer, 80);
+
+    readBuffer[charsRead] = '\0';
+
+    request += readBuffer;
 
 }
 
