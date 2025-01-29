@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -94,8 +95,29 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
 
     readBuffer[charsRead] = '\0';
 
-    request += readBuffer;
+    if(readBuffer[charsRead-1] == '\n'){
+        readBuffer[charsRead-2] = '\0';
+        request = readBuffer;
+    }
 
+    /*
+    vector<string> reqArr;
+    string part;
+
+    for(int i=0; i<request.length();i++){
+        if (i == ' ') {
+            part = request.substr(0,i);
+            reqArr.push_back(part);
+
+            request.replace(0,i,"");
+        }
+    }
+    */
+
+    cout << "Connection from " << inet_ntoa(client_addr->sin_addr) << endl
+    << request << endl;
+
+    close(conn_sock);
 }
 
 
