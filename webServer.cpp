@@ -5,7 +5,8 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -16,10 +17,14 @@ using namespace std;
 #define BIND_ERROR  3
 #define LISTEN_ERROR 4
 
+#define HTTP_METHOD_ERROR 5
+
 #define MAX_WAITING 25
 
 int doServer(int);
 void doWork(int, struct sockaddr_in *);
+// read function?
+// write function?
 
 int main(int argc, char *argv[]){
     
@@ -87,7 +92,10 @@ int doServer(int portNum){
 }
 
 void doWork(int conn_sock, struct sockaddr_in *client_addr){
-    string request;
+    stringstream request;
+    string method;
+    string path;
+    string version;
 
     char readBuffer[81];
 
@@ -97,8 +105,46 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
 
     if(readBuffer[charsRead-1] == '\n'){
         readBuffer[charsRead-2] = '\0';
-        request = readBuffer;
+        request << readBuffer;
     }
+
+    request >> method >> path >> version;
+
+    if (method == "GET") {
+        // remove leadings .'s and /'s from the request
+        
+        
+        cout << path << endl;
+
+        fstream fs;
+        fs.open(path);
+        if(fs.is_open()){
+            cout << "Found the file!" << endl;
+        }
+        else{
+            string buffer;
+            buffer = version + " 404 NOT FOUND";
+            buffer += "\r\n\r\n";
+            buffer += "<b>404 Error - resource not found on this server</b>";
+
+            char *cbuff = (char *) buffer.c_str();
+
+            int needed = buffer.length();
+
+            while (needed) {
+                int n = write(conn_sock, cbuff, needed);
+                needed -= n;
+                cbuff += n;
+            }
+        }
+
+    }
+    else{
+        cerr << "405 Method Not Allowed! Stopping the request!" << endl;
+    }
+
+
+
 
     /*
     vector<string> reqArr;
@@ -114,8 +160,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     }
     */
 
-    cout << "Connection from " << inet_ntoa(client_addr->sin_addr) << endl
-    << request << endl;
+    cout << "Connection from " << inet_ntoa(client_addr->sin_addr) << endl;
 
     close(conn_sock);
 }
