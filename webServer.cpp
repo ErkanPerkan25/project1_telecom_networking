@@ -97,6 +97,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     string path;
     string version;
 
+
     char readBuffer[81];
 
     int charsRead = read(conn_sock, readBuffer, 80);
@@ -110,16 +111,45 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
 
     request >> method >> path >> version;
 
+    cout << method << endl;
+
     if (method == "GET") {
         // remove leadings .'s and /'s from the request
-        
-        
-        cout << path << endl;
+        for(int i=0; i < path.length(); i++){
+            if(path[i] == '.' || path[i] == '/'){
+                path.erase(path.begin()+i);
+                i--;
+            }
+            else{
+                break;
+            }
+        }
 
+        path = "./" + path;
+ 
         fstream fs;
         fs.open(path);
         if(fs.is_open()){
-            cout << "Found the file!" << endl;
+            string buffer;
+
+            buffer = version + " 200 OK\n";
+            buffer += "Content-type:";
+            buffer += "\r\n\r\n";
+
+            while(!fs.eof()){
+                buffer += fs.get();
+            }
+
+            char *cbuff = (char *) buffer.c_str();
+
+            int needed = buffer.length();
+
+            while (needed) {
+                int n = write(conn_sock, cbuff, needed);
+                needed -= n;
+                cbuff += n;
+            }
+
         }
         else{
             string buffer;
@@ -142,24 +172,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     else{
         cerr << "405 Method Not Allowed! Stopping the request!" << endl;
     }
-
-
-
-
-    /*
-    vector<string> reqArr;
-    string part;
-
-    for(int i=0; i<request.length();i++){
-        if (i == ' ') {
-            part = request.substr(0,i);
-            reqArr.push_back(part);
-
-            request.replace(0,i,"");
-        }
-    }
-    */
-
+    
     cout << "Connection from " << inet_ntoa(client_addr->sin_addr) << endl;
 
     close(conn_sock);
