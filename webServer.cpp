@@ -97,21 +97,34 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     string path;
     string version;
 
-
     char readBuffer[81];
+    int charsRead;
+    int totalCharsRead;
 
-    int charsRead = read(conn_sock, readBuffer, 80);
+    string finalBuffer;
 
-    readBuffer[charsRead] = '\0';
+    while (true) {
+        charsRead = read(conn_sock, readBuffer, 80);
 
-    if(readBuffer[charsRead-1] == '\n'){
-        readBuffer[charsRead-2] = '\0';
-        request << readBuffer;
+        if(charsRead <= 0){
+            break;
+        }
+
+        finalBuffer.append(readBuffer, 80);
+
+        totalCharsRead += charsRead;
+    }
+    
+    finalBuffer[totalCharsRead] = '\0';
+
+    if(finalBuffer[totalCharsRead-1] == '\n'){
+        finalBuffer[totalCharsRead-2] = '\0';
+        request << finalBuffer;
     }
 
-    request >> method >> path >> version;
+    cout << request.str() << endl;
 
-    cout << method << endl;
+    request >> method >> path >> version;
 
     if (method == "GET") {
         // remove leadings .'s and /'s from the request
@@ -133,7 +146,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             string buffer;
 
             buffer = version + " 200 OK\n";
-            buffer += "Content-type:";
+            buffer += "Content-type: txt/html\n";
             buffer += "\r\n\r\n";
 
             while(!fs.eof()){
