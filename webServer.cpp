@@ -125,9 +125,6 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
         //request << finalBuffer;
     }
 
-
-    cout << request.str() << endl;
-
     request >> method >> path >> version;
 
     if (method == "GET") {
@@ -158,6 +155,8 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
                 buffer += fs.get();
             }
 
+            fs.close();
+
             char *cbuff = (char *) buffer.c_str();
 
             int needed = buffer.length();
@@ -167,11 +166,12 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
                 needed -= n;
                 cbuff += n;
             }
+            
 
         }
         else{
             string buffer;
-            buffer = version + " 404 NOT FOUND";
+            buffer = version + " 404 NOT FOUND\n";
             buffer += "\r\n\r\n";
             buffer += "<b>404 Error - resource not found on this server</b>";
 
