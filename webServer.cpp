@@ -98,29 +98,33 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     string version;
 
     char readBuffer[81];
-    int charsRead;
+    int charsRead; 
     int totalCharsRead;
-
     string finalBuffer;
 
     while (true) {
         charsRead = read(conn_sock, readBuffer, 80);
 
-        if(charsRead <= 0){
+        if(charsRead <= 0)
+            break;
+
+        //finalBuffer += (string)readBuffer;
+        request << readBuffer;
+        totalCharsRead += charsRead;
+
+        if(charsRead < 80){
             break;
         }
-
-        finalBuffer.append(readBuffer, 80);
-
-        totalCharsRead += charsRead;
     }
-    
-    finalBuffer[totalCharsRead] = '\0';
 
-    if(finalBuffer[totalCharsRead-1] == '\n'){
-        finalBuffer[totalCharsRead-2] = '\0';
-        request << finalBuffer;
+
+    request.str()[totalCharsRead] = '\0';
+
+    if(request.str()[totalCharsRead-1] == '\n'){
+        request.str()[totalCharsRead-2] = '\0';
+        //request << finalBuffer;
     }
+
 
     cout << request.str() << endl;
 
@@ -142,6 +146,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
  
         fstream fs;
         fs.open(path);
+
         if(fs.is_open()){
             string buffer;
 
