@@ -92,6 +92,7 @@ int doServer(int portNum){
 }
 
 void doWork(int conn_sock, struct sockaddr_in *client_addr){
+    // Variables to store request information
     stringstream request;
     string method;
     string path;
@@ -102,16 +103,21 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     int totalCharsRead;
     string finalBuffer;
 
+    // reading in values
     while (true) {
+        // read how many characters that have been read
         charsRead = read(conn_sock, readBuffer, 80);
 
+        // if no characters read, stop
         if(charsRead <= 0)
             break;
 
-        //finalBuffer += (string)readBuffer;
+        // read in chars, store them
         request << readBuffer;
+        // stores how many characters that have been read total
         totalCharsRead += charsRead;
 
+        // If there less than then the max that can be read, we are done
         if(charsRead < 80){
             break;
         }
@@ -127,6 +133,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
 
     request >> method >> path >> version;
 
+    // when method is GET, do the GET request
     if (method == "GET") {
         // remove leadings .'s and /'s from the request
         for(int i=0; i < path.length(); i++){
@@ -139,28 +146,40 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             }
         }
 
+        // set path to the current directory
         path = "./" + path;
  
+        // checks if the file exist by trying to open it
         fstream fs;
         fs.open(path);
 
+        // if it is open, it exists, send the content
         if(fs.is_open()){
+            // buffer to store content
             string buffer;
+            
+            // header information
+            buffer += version + " 200 OK\n";
+            buffer += "Content-Type: text/html\n";
 
-            buffer = version + " 200 OK\n";
-            buffer += "Content-type: txt/html\n";
-            buffer += "\r\n\r\n";
-
+            buffer += "\r\n";
+            
+            // not end of file, keep reading characters
             while(!fs.eof()){
                 buffer += fs.get();
             }
 
             fs.close();
 
+            buffer += "\r\n";
+
+            // the content in char pointer array form
             char *cbuff = (char *) buffer.c_str();
 
+            // how much data is going to be sent to the client
             int needed = buffer.length();
 
+            // send the content to the client
             while (needed) {
                 int n = write(conn_sock, cbuff, needed);
                 needed -= n;
@@ -169,11 +188,15 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             
 
         }
+        // file does not exist, send error message
         else{
+            // buffer for the content
             string buffer;
+            // header information
             buffer = version + " 404 NOT FOUND\n";
-            buffer += "\r\n\r\n";
             buffer += "<b>404 Error - resource not found on this server</b>";
+            buffer += "\r\n\r\n";
+
 
             char *cbuff = (char *) buffer.c_str();
 
@@ -187,6 +210,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
         }
 
     }
+    // does not now the method, return bad request
     else{
         cerr << "405 Method Not Allowed! Stopping the request!" << endl;
     }
