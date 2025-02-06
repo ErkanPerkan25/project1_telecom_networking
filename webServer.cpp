@@ -23,8 +23,6 @@ using namespace std;
 
 int doServer(int);
 void doWork(int, struct sockaddr_in *);
-// read function?
-// write function?
 
 int main(int argc, char *argv[]){
     
@@ -171,7 +169,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
 
             fs.close();
 
-            buffer += "\r\n";
+            buffer += "\r\n\r\n";
 
             // the content in char pointer array form
             char *cbuff = (char *) buffer.c_str();
