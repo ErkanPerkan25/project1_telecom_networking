@@ -158,10 +158,8 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             
             // header information
             buffer += version + " 200 OK\n";
-            buffer += "Content-Type: text/html\n";
+            buffer += "Content-Type: text/html\r\n\r\n";
 
-            buffer += "\r\n";
-            
             // not end of file, keep reading characters
             while(!fs.eof()){
                 buffer += fs.get();
@@ -169,7 +167,6 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
 
             fs.close();
 
-            buffer += "\r\n\r\n";
 
             // the content in char pointer array form
             char *cbuff = (char *) buffer.c_str();
@@ -191,10 +188,8 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             // buffer for the content
             string buffer;
             // header information
-            buffer = version + " 404 NOT FOUND\n";
+            buffer = version + " 404 NOT FOUND\r\n\r\n";
             buffer += "<b>404 Error - resource not found on this server</b>";
-            buffer += "\r\n\r\n";
-
 
             char *cbuff = (char *) buffer.c_str();
 
