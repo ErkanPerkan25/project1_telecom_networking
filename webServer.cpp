@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <cstdio>
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -116,9 +117,9 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
         totalCharsRead += charsRead;
 
         // If there less than then the max that can be read, we are done
-        if(charsRead < 80){
+        if(charsRead < 80)
             break;
-        }
+        
     }
 
 
@@ -158,21 +159,23 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             
             // header information
             buffer += version + " 200 OK\n";
-            buffer += "Content-Type: text/html\r\n\r\n";
+            buffer += "Content-Type: text/html; charset=utf-8\r\n\r\n";
 
-            // not end of file, keep reading characters
-            while(!fs.eof()){
-                buffer += fs.get();
+            // as long as characters are read, add to buffer
+            char ch;
+            while(fs.get(ch)){
+                buffer += ch;
             }
 
+            // Close file when done
             fs.close();
-
 
             // the content in char pointer array form
             char *cbuff = (char *) buffer.c_str();
 
             // how much data is going to be sent to the client
             int needed = buffer.length();
+            
 
             // send the content to the client
             while (needed) {
@@ -191,10 +194,13 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             buffer = version + " 404 NOT FOUND\r\n\r\n";
             buffer += "<b>404 Error - resource not found on this server</b>";
 
+            // converts string to char pointer array
             char *cbuff = (char *) buffer.c_str();
 
+            // the total number of characters
             int needed = buffer.length();
 
+            // send the content to the client
             while (needed) {
                 int n = write(conn_sock, cbuff, needed);
                 needed -= n;
@@ -208,8 +214,10 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
         cerr << "405 Method Not Allowed! Stopping the request!" << endl;
     }
     
+    // Prints out the connection the server has accepted
     cout << "Connection from " << inet_ntoa(client_addr->sin_addr) << endl;
 
+    // closes the socket
     close(conn_sock);
 }
 
