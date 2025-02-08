@@ -100,7 +100,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     string path;
     string version;
 
-    // 
+    // Variables to read in data and keep count of it 
     char readBuffer[81];
     int charsRead; 
     int totalCharsRead;
