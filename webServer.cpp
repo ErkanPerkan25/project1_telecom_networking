@@ -1,3 +1,11 @@
+/*****************************************************
+* Author: Eric Hansson
+* Date: 2/8/2025
+* File: webServer.cpp
+* Purpose: To run a Web Server that will return data to
+* a client that connect to the server. It can send over
+* telnet and http.
+******************************************************/
 #include <arpa/inet.h>
 #include <cstdio>
 #include <netinet/in.h>
