@@ -18,15 +18,15 @@ using namespace std;
 #define BIND_ERROR  3
 #define LISTEN_ERROR 4
 
-#define HTTP_METHOD_ERROR 5
-
 #define MAX_WAITING 25
 
+// Functions to run
 int doServer(int);
 void doWork(int, struct sockaddr_in *);
 
 int main(int argc, char *argv[]){
-    
+   
+    // if command is not right, send error
     if(argc!=2){
         cerr << "Usage: " << argv[0] << " <port number>" << endl;
         exit (USAGE_ERROR);
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]){
     return doServer(stoi(argv[1]));
 }
 
+// starts the server
 int doServer(int portNum){
     // the listenting socket
     int listen_sock = socket(AF_INET, SOCK_STREAM, 0);
@@ -45,7 +46,8 @@ int doServer(int portNum){
         return SOCK_ERROR;
     }
 
-    //
+    //A sockaddr_in structure specifies the address of the socket
+    //for TCP/IP sockets.
     struct sockaddr_in local_addr;
 
     // Fill in local (server) half of socket info
@@ -90,6 +92,7 @@ int doServer(int portNum){
     return SUCCESS;
 }
 
+// Handles and does the process of the server
 void doWork(int conn_sock, struct sockaddr_in *client_addr){
     // Variables to store request information
     stringstream request;
@@ -97,10 +100,10 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     string path;
     string version;
 
+    // 
     char readBuffer[81];
     int charsRead; 
     int totalCharsRead;
-    string finalBuffer;
 
     // reading in values
     while (true) {
