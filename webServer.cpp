@@ -123,13 +123,14 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
     }
 
 
+    // processing the request
     request.str()[totalCharsRead] = '\0';
 
     if(request.str()[totalCharsRead-1] == '\n'){
         request.str()[totalCharsRead-2] = '\0';
-        //request << finalBuffer;
     }
 
+    // Reads in the client request
     request >> method >> path >> version;
 
     // when method is GET, do the GET request
@@ -159,7 +160,7 @@ void doWork(int conn_sock, struct sockaddr_in *client_addr){
             
             // header information
             buffer += version + " 200 OK\n";
-            buffer += "Content-Type: text/html; charset=utf-8\r\n\r\n";
+            buffer += "Content-Type: text/html\r\n\r\n";
 
             // as long as characters are read, add to buffer
             char ch;
