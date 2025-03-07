@@ -1,5 +1,5 @@
 # Web Server (Using HTTP protocol)
-**project1_telecom_networking**
+**Project 1 in Telecommunication and Networking**
 
 The program is a Unix (Posix) socket based web server. The web server takes in a single
 command line argument indicating the port number the server is to utilize.
