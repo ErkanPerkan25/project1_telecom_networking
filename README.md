@@ -1,6 +1,9 @@
 # Web Server (Using HTTP protocol)
 **project1_telecom_networking**
 
+The program is a Unix (Posix) socket based web server. The web server takes in a single
+command line argument indicating the port number the server is to utilize.
+
 Author: **Eric Hansson** <br>
 
 - Platform:<br>
